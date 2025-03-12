@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fancy serias - Lamiy</title>
+    <style>
+        :root {
+            --color-1: #e5e2af;
+            --color-2: #e9bad2;
+            --color-3: #d7cde1;
+            --color-4: #d5e6ea;
+            --color-5: #ebb6b6;
+        }
+        
+        body {
+            background: var(--color-4);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            background-color: var(--color-1);
+            padding: 15px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .gallery-container {
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto 50px;
+        }
+        
+        .gallery {
+            --size: min(70vmin, 600px);
+            position: relative;
+            margin: 0 auto;
+            box-shadow: 
+                0 0 10px rgba(0, 0, 0, 0.1),
+                0 20px 40px -20px rgba(0, 0, 0, 0.2);
+            width: var(--size);
+            height: var(--size);
+            background: #fff;
+            border: 6px solid #fff;
+            display: grid;
+            grid-template-rows: 50% 50%;
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
+            gap: 6px;
+        }
+        
+        .gallery img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        @keyframes moveHorizontal {
+            to {
+                object-position: 100% 0;
+            }
+        }
+        
+        @keyframes moveVertical {
+            to {
+                object-position: 0 100%;
+            }
+        }
+        
+        @keyframes shrinkVertical {
+            to {
+                height: 0;
+            }
+        }
+        
+        @keyframes shrinkHorizontal {
+            to {
+                width: 0;
+            }
+        }
+        
+        @keyframes growHorizontal {
+            to {
+                width: 100%;
+            }
+        }
+        
+        @keyframes growVertical {
+            to {
+                height: 100%;
+            }
+        }
+        
+        @keyframes growAll {
+            to {
+                width: 100%;
+                height: 100%;
+            }
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            padding: 8px 16px;
+            background-color: var(--color-5);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+        
+        .control-btn:hover {
+            background-color: var(--color-2);
+            transform: translateY(-2px);
+        }
+        
+        .progress-bar {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 6px;
+            background-color: var(--color-3);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--color-2);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+    </style>
+</head>
+<body>
+    <h1>Fancy serias - Lamiy</h1>
+    
+    <div class="gallery-container">
+        <div class="gallery" id="gallery">
+            <!-- JavaScript で動的に画像を追加 -->
+        </div>
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button class="control-btn" id="pauseBtn">一時停止</button>
+        <button class="control-btn" id="resetBtn">リセット</button>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 画像のパス
+            const imagePath = 'images/';
+            const imageFiles = [
+                '1R7A7333_DxO2k.jpg',
+                '1R7A7335_DxO2k.jpg',
+                '1R7A7348_DxO2k.jpg',
+                '1R7A7349_DxO2k.jpg',
+                '1R7A7350_DxO2k.jpg',
+                '1R7A7352_DxO2k.jpg',
+                '1R7A7354_DxO2k.jpg',
+                '1R7A7356_DxO2k.jpg',
+                '1R7A7357_DxO2k.jpg',
+                '1R7A7358_DxO2k.jpg',
+                '1R7A7359_DxO2k.jpg',
+                '1R7A7360_DxO2k.jpg',
+                '1R7A7361_DxO2k.jpg',
+                '1R7A7363_DxO2k.jpg',
+                '1R7A7371_DxO2k.jpg',
+                '1R7A7370_DxO2k.jpg',
+                '1R7A7378_DxO2k.jpg',
+                '1R7A7380_DxO2k.jpg',
+                '1R7A7384_DxO2k.jpg',
+                '1R7A7391_DxO2k.jpg',
+                '1R7A7404_DxO2k.jpg',
+                '1R7A7411_DxO2k.jpg'
+            ];
+            
+            const gallery = document.getElementById('gallery');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const progress = document.getElementById('progress');
+            
+            // アニメーションの設定
+            const numImages = 7; // 一度に表示する画像数
+            const cycleDuration = 20; // 35:アニメーションの合計時間（秒）
+            const animationCSS = [
+                // 画像1のCSS
+                `grid-column: 1;
+                grid-row: 1;
+                justify-self: end;
+                animation: 
+                    moveHorizontal 8.5s 0.5s 1,
+                    shrinkHorizontal 2s 9s ease-in 1;
+                animation-fill-mode: forwards;`,
+                
+                // 画像2のCSS
+                `grid-column: 2;
+                grid-row: 1;
+                justify-self: end;
+                animation: 
+                    shrinkHorizontal 2s 11s 1;
+                animation-fill-mode: forwards;`,
+                
+                // 画像3のCSS
+                `grid-row: 2;
+                grid-column: 1 / 3;
+                align-self: end;
+                object-position: 0 0;
+                animation:
+                    moveVertical 5s 1s 1,
+                    shrinkVertical 3s 5s 1;
+                animation-fill-mode: forwards;`,
+                
+                // 画像4のCSS
+                `grid-column: 1 / 3;
+                grid-row: 1;
+                width: 0;
+                justify-self: center;
+                align-self: start;
+                animation: 
+                    growHorizontal 2.25s 11s 1,
+                    moveHorizontal 4s 14s 1,
+                    shrinkVertical 2s 18s 1;
+                animation-fill-mode: forwards;`,
+                
+                // 画像5のCSS
+                `grid-column: 1;
+                grid-row: 2;
+                width: 0;
+                justify-self: start;
+                align-self: end;
+                animation: 
+                    growHorizontal 2.5s 7.5s 1,
+                    moveVertical 4s 12.5s 1,
+                    shrinkHorizontal 2s 17s 1;
+                animation-fill-mode: forwards;`,
+                
+                // 画像6のCSS
+                `grid-column: 2;
+                grid-row: 2;
+                width: 0;
+                justify-self: end;
+                align-self: end;
+                animation: 
+                    growHorizontal 2s 8s 1,
+                    shrinkHorizontal 2s 17s 1;
+                animation-fill-mode: forwards;`/*,
+                
+                // 画像7のCSS
+                `grid-column: 1/3;
+                grid-row: 1/3;
+                width: 0;
+                justify-self: end;
+                align-self: end;
+                object-position: 0 0;
+                animation: 
+                    growHorizontal 2s 20s 1,
+                    moveHorizontal 16s 21.5s 1;
+                animation-fill-mode: forwards;`*/
+            ];
+            
+            let currentIndex = 0;
+            let isPaused = false;
+            let animationStartTime = null;
+            let pausedTime = 0;
+            let animationTimer = null;
+            
+            // ギャラリーにセットを表示する関数
+            function displaySet(startIndex) {
+                gallery.innerHTML = '';
+                
+                for (let i = 0; i < numImages; i++) {
+                    const imageIndex = (startIndex + i) % imageFiles.length;
+                    const img = document.createElement('img');
+                    img.src = imagePath + imageFiles[imageIndex];
+                    img.alt = 'Gallery Image ' + (imageIndex + 1);
+                    img.style.cssText = animationCSS[i];
+                    gallery.appendChild(img);
+                }
+            }
+            
+            // 次のセットに移行する関数
+            function nextSet() {
+                currentIndex = (currentIndex + numImages) % imageFiles.length;
+                resetAnimation();
+            }
+            
+            // アニメーションを再設定する関数
+            function resetAnimation() {
+                displaySet(currentIndex);
+                animationStartTime = Date.now();
+                pausedTime = 0;
+                startProgressBar();
+            }
+            
+            // プログレスバーを開始する関数
+            function startProgressBar() {
+                if (animationTimer) {
+                    clearInterval(animationTimer);
+                }
+                
+                animationTimer = setInterval(() => {
+                    if (!isPaused) {
+                        const elapsedTime = (Date.now() - animationStartTime - pausedTime) / 1000;
+                        const percentage = Math.min((elapsedTime / cycleDuration) * 100, 100);
+                        progress.style.width = percentage + '%';
+                        
+                        if (percentage >= 100) {
+                            nextSet();
+                        }
+                    }
+                }, 100);
+            }
+            
+            // 一時停止/再開ボタンのイベントリスナー
+            pauseBtn.addEventListener('click', function() {
+                if (isPaused) {
+                    // 再開
+                    isPaused = false;
+                    pausedTime += Date.now() - pauseStartTime;
+                    pauseBtn.textContent = '一時停止';
+                    
+                    // アニメーションを再開
+                    gallery.querySelectorAll('img').forEach(img => {
+                        img.style.animationPlayState = 'running';
+                    });
+                } else {
+                    // 一時停止
+                    isPaused = true;
+                    pauseStartTime = Date.now();
+                    pauseBtn.textContent = '再開';
+                    
+                    // アニメーションを一時停止
+                    gallery.querySelectorAll('img').forEach(img => {
+                        img.style.animationPlayState = 'paused';
+                    });
+                }
+            });
+            
+            // リセットボタンのイベントリスナー
+            resetBtn.addEventListener('click', resetAnimation);
+            
+            // 初期表示
+            let pauseStartTime = 0;
+            resetAnimation();
+        });
+    </script>
+</body>
+</html>

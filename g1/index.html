@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fancy serias - Lamiy</title>
+    <style>
+        :root {
+            --color-1: #e9bad2; /*pink*/
+            --color-2: #d5e6ea; /*blue*/
+            --color-3: #d7cde1; /*purple*/
+            --color-4: #e5e2af; /*yellow*/
+            --color-5: #ebb6b6; /*orange*/
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--color-4);
+            color: #333;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            background-color: var(--color-1);
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+        }
+        
+        .gallery-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            aspect-ratio: 3/2;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            overflow: auto;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            position: relative;
+            margin: auto;
+            width: 90%;
+            max-width: 1000px;
+            background-color: var(--color-3);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-image {
+            width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+        
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 30px;
+            color: #333;
+            cursor: pointer;
+            z-index: 20;
+        }
+        
+        .close:hover {
+            color: var(--color-5);
+        }
+        
+        .prev, .next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 40px;
+            font-weight: bold;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.3s ease;
+        }
+        
+        .prev {
+            left: 20px;
+        }
+        
+        .next {
+            right: 20px;
+        }
+        
+        .prev:hover, .next:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        
+        .image-counter {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--color-2);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 10px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        .loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+        }
+        
+        .loader::after {
+            content: "";
+            width: 50px;
+            height: 50px;
+            border: 10px solid var(--color-1);
+            border-top-color: var(--color-5);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            background-color: var(--color-5);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn:hover {
+            background-color: var(--color-2);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Fancy serias - Lamiy</h1>
+    </header>
+    
+    <div class="gallery-container">
+        <div class="controls">
+            <button class="filter-btn" id="shuffleBtn">ランダム表示</button>
+        </div>
+        
+        <div class="gallery" id="gallery">
+            <div class="loader"></div>
+        </div>
+    </div>
+    
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img class="modal-image" id="modalImage">
+            <div class="image-counter" id="imageCounter"></div>
+            <div class="prev">&#10094;</div>
+            <div class="next">&#10095;</div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 画像のパス
+            const imagePath = 'images/';
+            const imageFiles = [
+                '1R7A7333_DxO2k.jpg',
+                '1R7A7335_DxO2k.jpg',
+                '1R7A7348_DxO2k.jpg',
+                '1R7A7349_DxO2k.jpg',
+                '1R7A7350_DxO2k.jpg',
+                '1R7A7352_DxO2k.jpg',
+                '1R7A7354_DxO2k.jpg',
+                '1R7A7356_DxO2k.jpg',
+                '1R7A7357_DxO2k.jpg',
+                '1R7A7358_DxO2k.jpg',
+                '1R7A7359_DxO2k.jpg',
+                '1R7A7360_DxO2k.jpg',
+                '1R7A7361_DxO2k.jpg',
+                '1R7A7363_DxO2k.jpg',
+                '1R7A7370_DxO2k.jpg',
+                '1R7A7371_DxO2k.jpg',
+                '1R7A7378_DxO2k.jpg',
+                '1R7A7380_DxO2k.jpg',
+                '1R7A7384_DxO2k.jpg',
+                '1R7A7391_DxO2k.jpg',
+                '1R7A7404_DxO2k.jpg',
+                '1R7A7411_DxO2k.jpg'
+            ];
+            
+            const gallery = document.getElementById('gallery');
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            const closeBtn = document.querySelector('.close');
+            const prevBtn = document.querySelector('.prev');
+            const nextBtn = document.querySelector('.next');
+            const imageCounter = document.getElementById('imageCounter');
+            const shuffleBtn = document.getElementById('shuffleBtn');
+            
+            let currentIndex = 0;
+            
+            // ギャラリーに画像を表示
+            function displayImages(images) {
+                gallery.innerHTML = '';
+                
+                images.forEach((image, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'gallery-item';
+                    
+                    const img = document.createElement('img');
+                    img.src = imagePath + image;
+                    img.alt = 'Gallery Image ' + (index + 1);
+                    img.loading = 'lazy';
+                    
+                    img.addEventListener('click', function() {
+                        openModal(index);
+                    });
+                    
+                    item.appendChild(img);
+                    gallery.appendChild(item);
+                });
+            }
+            
+            // モーダルを開く
+            function openModal(index) {
+                modal.style.display = 'block';
+                currentIndex = index;
+                updateModalImage();
+            }
+            
+            // モーダル画像を更新
+            function updateModalImage() {
+                modalImg.src = imagePath + imageFiles[currentIndex];
+                imageCounter.textContent = `${currentIndex + 1} / ${imageFiles.length}`;
+            }
+            
+            // 次の画像を表示
+            function nextImage() {
+                currentIndex = (currentIndex + 1) % imageFiles.length;
+                updateModalImage();
+            }
+            
+            // 前の画像を表示
+            function prevImage() {
+                currentIndex = (currentIndex - 1 + imageFiles.length) % imageFiles.length;
+                updateModalImage();
+            }
+            
+            // ランダムに並べ替え
+            function shuffleImages() {
+                const shuffled = [...imageFiles];
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                displayImages(shuffled);
+            }
+            
+            // イベントリスナー
+            closeBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+            
+            prevBtn.addEventListener('click', prevImage);
+            nextBtn.addEventListener('click', nextImage);
+            shuffleBtn.addEventListener('click', shuffleImages);
+            
+            // キーボード操作
+            document.addEventListener('keydown', function(e) {
+                if (modal.style.display === 'block') {
+                    if (e.key === 'ArrowRight') {
+                        nextImage();
+                    } else if (e.key === 'ArrowLeft') {
+                        prevImage();
+                    } else if (e.key === 'Escape') {
+                        modal.style.display = 'none';
+                    }
+                }
+            });
+            
+            // モーダル外をクリックしたらモーダルを閉じる
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            // 画像を表示
+            displayImages(imageFiles);
+        });
+    </script>
+</body>
+</html>

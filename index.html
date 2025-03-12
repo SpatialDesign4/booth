@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boothギャラリー</title>
+    <style>
+        :root {
+            --color-1: #e9bad2; /*pink*/
+            --color-2: #d5e6ea; /*blue*/
+            --color-3: #d7cde1; /*purple*/
+            --color-4: #e5e2af; /*yellow*/
+            --color-5: #ebb6b6; /*orange*/
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--color-2);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: var(--color-3);
+            border-radius: 10px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        p {
+            color: #555;
+            font-size: 1.2rem;
+        }
+        
+        .gallery-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 900px;
+        }
+        
+        .gallery-group {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .gallery-group:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .gallery-group h2 {
+            color: #333;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--color-4);
+        }
+        
+        .gallery-group ul {
+            list-style-type: none;
+        }
+        
+        .gallery-group li {
+            margin-bottom: 15px;
+        }
+        
+        .gallery-group a {
+            display: block;
+            text-decoration: none;
+            color: #333;
+            background-color: var(--color-1);
+            padding: 12px 20px;
+            border-radius: 30px;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .gallery-group a.animated {
+            background-color: var(--color-5);
+        }
+        
+        .gallery-group a:hover {
+            background-color: var(--color-4);
+            transform: scale(1.05);
+        }
+        
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .gallery-links {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .gallery-group h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>写真ギャラリーリンク集</h1>
+        <p>様々なスタイルの写真ギャラリーをご覧いただけます</p>
+    </header>
+    
+    <div class="gallery-links">
+        <div class="gallery-group">
+            <h2>Fancy series - Lamiy</h2>
+            <ul>
+                <li><a href="g1/index.html">一覧ギャラリー</a></li>
+                <li><a href="g1/animated.html" class="animated">アニメーションギャラリー</a></li>
+            </ul>
+        </div>
+        
+        <div class="gallery-group">
+            <h2>World Taste Collections</h2>
+            <ul>
+                <li><a href="g2/index.html">一覧ギャラリー</a></li>
+                <li><a href="g2/animated.html" class="animated">アニメーションギャラリー</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 写真ギャラリーデモ - Created with Claude</p>
+    </footer>
+</body>
+</html>
