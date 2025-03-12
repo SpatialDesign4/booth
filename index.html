@@ -11,6 +11,8 @@
             --color-3: #d7cde1; /*purple*/
             --color-4: #e5e2af; /*yellow*/
             --color-5: #ebb6b6; /*orange*/
+            --color-6: #002b00; /*green*/
+            --color-7: #4c3428; /*brown*/
         }
         
         * {
@@ -112,6 +114,16 @@
             transform: scale(1.05);
         }
         
+        .gallery-group.g2 a {
+            background-color: var(--color-6);
+            color: #eee;
+        }
+
+        .gallery-group.g2 a.animated {
+            background-color: var(--color-7);
+            color: #eee;
+        }
+
         footer {
             margin-top: 40px;
             text-align: center;
@@ -149,7 +161,7 @@
             </ul>
         </div>
         
-        <div class="gallery-group">
+        <div class="gallery-group g2">
             <h2>2班：World Taste Collections</h2>
             <ul>
                 <li><a href="g2/index.html">一覧ギャラリー</a></li>
